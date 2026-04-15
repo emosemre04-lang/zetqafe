@@ -920,6 +920,121 @@
     }
     .footer-quattro:hover { color:rgba(245,197,24,.4); }
 
+    /* ═══════════════════════════════════════════════════
+       ① LIQUID BLOBS — fond vivant animé
+    ═══════════════════════════════════════════════════ */
+    .blobs-bg {
+      position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+    }
+    .blob {
+      position:absolute; border-radius:50%;
+      filter:blur(90px); opacity:.18; mix-blend-mode:screen;
+      animation:blobFloat linear infinite;
+    }
+    .blob:nth-child(1){width:520px;height:520px;background:radial-gradient(#F5C518,transparent 70%);top:-10%;left:-5%;animation-duration:22s;animation-delay:0s;}
+    .blob:nth-child(2){width:380px;height:380px;background:radial-gradient(#d4860a,transparent 70%);top:30%;right:-8%;animation-duration:28s;animation-delay:-7s;}
+    .blob:nth-child(3){width:460px;height:460px;background:radial-gradient(#6b3e00,transparent 70%);bottom:-5%;left:20%;animation-duration:33s;animation-delay:-14s;}
+    .blob:nth-child(4){width:280px;height:280px;background:radial-gradient(#F5C518,transparent 70%);top:55%;left:40%;animation-duration:18s;animation-delay:-4s;opacity:.1;}
+    [data-theme="light"] .blob { opacity:.1; mix-blend-mode:multiply; }
+    @keyframes blobFloat {
+      0%   { transform:translate(0,0) scale(1); }
+      25%  { transform:translate(40px,-30px) scale(1.08); }
+      50%  { transform:translate(-20px,50px) scale(.94); }
+      75%  { transform:translate(30px,20px) scale(1.05); }
+      100% { transform:translate(0,0) scale(1); }
+    }
+
+    /* ④ GRAIN CINÉMATIQUE */
+    .grain {
+      position:fixed; inset:0; z-index:1; pointer-events:none;
+      opacity:.045;
+      background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+      background-repeat:repeat; background-size:200px 200px;
+      animation:grainShift .12s steps(1) infinite;
+    }
+    [data-theme="light"] .grain { opacity:.025; }
+    @keyframes grainShift {
+      0%  { background-position:0 0; }
+      20% { background-position:-40px 10px; }
+      40% { background-position:20px -30px; }
+      60% { background-position:-10px 40px; }
+      80% { background-position:30px -10px; }
+      100%{ background-position:0 0; }
+    }
+
+    /* ⑧ COULEUR PAR CATÉGORIE */
+    #yemek    { --cat-color: #F5C518; }
+    #energy   { --cat-color: #00d4ff; }
+    #sodas    { --cat-color: #ff6b35; }
+    #chaud    { --cat-color: #c8813a; }
+    #cannette { --cat-color: #e03535; }
+    #confis   { --cat-color: #ff9ecb; }
+    #glaces   { --cat-color: #7dd3fc; }
+
+    .menu-section .section-icon-wrap {
+      background:rgba(var(--cat-r,245),var(--cat-g,197),var(--cat-b,24),.1);
+      border-color:rgba(var(--cat-r,245),var(--cat-g,197),var(--cat-b,24),.25);
+      transition:background .3s;
+    }
+    .menu-section .section-title { color:var(--cat-color, var(--gold)); }
+    .menu-section .section-sep   { background:var(--cat-color, var(--gold)); }
+    .menu-section .tab.active, .menu-section .price-tag { background:var(--cat-color,var(--gold)); }
+
+    /* ⑤ PRIX COMPTEUR — invisible avant animation */
+    .price-tag[data-price] { transition:opacity .3s; }
+
+    /* ③ MAGNETIC CARD — variable CSS injectée par JS */
+    .card-wrap { transform-style:preserve-3d; }
+
+    /* ① BENTO — première section : 1ère card grande */
+    @media (min-width:1025px) {
+      #yemek .grid .card-wrap:first-child .card { aspect-ratio:21/9 !important; }
+      #yemek .grid .card-wrap:first-child { grid-column:span 2; }
+    }
+
+    /* ⑦ GLASSMORPHISM depth — card glow sur hover */
+    .card::before {
+      content:''; position:absolute; inset:0; z-index:5; border-radius:inherit;
+      background:radial-gradient(circle at var(--mx,50%) var(--my,50%),
+        rgba(245,197,24,.08) 0%, transparent 60%);
+      opacity:0; transition:opacity .3s; pointer-events:none;
+    }
+    .card:hover::before { opacity:1; }
+
+    /* ⑩ SPOTLIGHT REVEAL — animation d'entrée cinématique */
+    @keyframes spotlightReveal {
+      0%   { opacity:0; clip-path:inset(0 100% 0 0); transform:translateX(-12px); }
+      60%  { opacity:1; clip-path:inset(0 0% 0 0); transform:translateX(0); }
+      100% { opacity:1; clip-path:inset(0 0% 0 0); transform:translateX(0); }
+    }
+    .reveal.visible { animation:spotlightReveal .65s cubic-bezier(.22,.68,0,1.2) forwards !important; }
+    .reveal.visible:nth-child(2) { animation-delay:.08s; }
+    .reveal.visible:nth-child(3) { animation-delay:.16s; }
+    .reveal.visible:nth-child(4) { animation-delay:.24s; }
+    .reveal.visible:nth-child(5) { animation-delay:.30s; }
+    .reveal.visible:nth-child(6) { animation-delay:.36s; }
+
+    /* ⑨ HERO SPLIT — produit phare à droite */
+    .hero-split {
+      position:absolute; right:0; top:0; bottom:0; width:42%;
+      overflow:hidden; z-index:2;
+    }
+    .hero-split img {
+      width:100%; height:100%; object-fit:cover;
+      filter:brightness(.6) saturate(.8);
+      transition:opacity .8s;
+    }
+    .hero-split::after {
+      content:''; position:absolute; inset:0;
+      background:linear-gradient(to right, var(--bg) 0%, transparent 50%);
+    }
+    @media (max-width:768px) { .hero-split { display:none; } }
+
+    /* section header accent line animée */
+    .menu-section::before {
+      background:linear-gradient(90deg, var(--cat-color,var(--gold)) 0%, transparent 80%) !important;
+    }
+
     /* ══════════════════════════════════
        ADMIN OVERLAY
     ══════════════════════════════════ */
@@ -1226,6 +1341,15 @@
   </div>
 </div>
 
+<!-- ① Liquid Blobs -->
+<div class="blobs-bg" aria-hidden="true">
+  <div class="blob"></div>
+  <div class="blob"></div>
+  <div class="blob"></div>
+  <div class="blob"></div>
+</div>
+<!-- ④ Grain cinématique -->
+<div class="grain" aria-hidden="true"></div>
 <div class="scene" aria-hidden="true">
   <div class="scene-grid"></div>
   <div class="scene-glow"></div>
@@ -1236,6 +1360,10 @@
 <!-- HERO -->
 <section class="hero">
   <img class="hero-bg" src="https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=1920&q=85" alt=""/>
+  <!-- ⑨ Hero split — produit phare -->
+  <div class="hero-split" id="heroSplit">
+    <img id="heroSplitImg" src="https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=800&q=80" alt=""/>
+  </div>
   <div class="hero-overlay"></div>
   <div class="hero-content">
     <div class="logo-row">
@@ -1776,6 +1904,136 @@ if (!('ontouchstart' in window)) {
     wrap.addEventListener('mouseleave', () => { card.style.transform = ''; });
   });
 }
+
+/* ════════════════════════════════════════════════════
+   ③ MAGNETIC CARDS — spring physics
+════════════════════════════════════════════════════ */
+document.querySelectorAll('.card-wrap, .list-item').forEach(el => {
+  el.addEventListener('mousemove', e => {
+    const r  = el.getBoundingClientRect();
+    const cx = r.left + r.width  / 2;
+    const cy = r.top  + r.height / 2;
+    const dx = (e.clientX - cx) * .12;
+    const dy = (e.clientY - cy) * .12;
+    el.style.transform = `translate(${dx}px,${dy}px)`;
+    // spotlight interne
+    const card = el.querySelector('.card') || el;
+    const mx = ((e.clientX - r.left) / r.width  * 100).toFixed(1);
+    const my = ((e.clientY - r.top)  / r.height * 100).toFixed(1);
+    card.style.setProperty('--mx', mx + '%');
+    card.style.setProperty('--my', my + '%');
+  });
+  el.addEventListener('mouseleave', () => {
+    el.style.transform = '';
+  });
+});
+
+/* ════════════════════════════════════════════════════
+   ⑤ PRIX COMPTEUR — compte jusqu'au vrai prix
+════════════════════════════════════════════════════ */
+function animatePrice(el, target) {
+  const val = parseFloat(target.replace(',', '.'));
+  if (isNaN(val)) return;
+  let start = null;
+  const dur  = 800;
+  function step(ts) {
+    if (!start) start = ts;
+    const p = Math.min((ts - start) / dur, 1);
+    const ease = 1 - Math.pow(1 - p, 3);
+    const cur = (ease * val).toFixed(2).replace('.', ',');
+    el.textContent = cur;
+    if (p < 1) requestAnimationFrame(step);
+    else el.textContent = target;
+  }
+  requestAnimationFrame(step);
+}
+const priceObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (!e.isIntersecting) return;
+    const el = e.target;
+    const raw = el.dataset.price || el.textContent.trim().replace(' €','');
+    if (!el.dataset.price) el.dataset.price = raw;
+    animatePrice(el, raw);
+    priceObs.unobserve(el);
+  });
+}, { threshold:.6 });
+document.querySelectorAll('.price-tag, .list-price .num').forEach(el => priceObs.observe(el));
+
+/* ════════════════════════════════════════════════════
+   ⑥ GYROSCOPE — parallax mobile
+════════════════════════════════════════════════════ */
+if (window.DeviceOrientationEvent && 'ontouchstart' in window) {
+  window.addEventListener('deviceorientation', e => {
+    const tx = (e.gamma || 0) * .4;
+    const ty = (e.beta  || 0) * .2;
+    document.querySelector('.scene-grid').style.transform =
+      `perspective(550px) rotateX(72deg) translate(${tx}px,${ty}px)`;
+    document.querySelectorAll('.blob').forEach((b, i) => {
+      const f = .3 + i * .15;
+      b.style.transform += ` translate(${tx*f}px,${ty*f}px)`;
+    });
+  }, { passive:true });
+}
+
+/* ════════════════════════════════════════════════════
+   ⑧ COULEUR PAR CATÉGORIE — injecte les variables
+════════════════════════════════════════════════════ */
+const catColors = {
+  yemek:   [245,197,24],
+  energy:  [0,212,255],
+  sodas:   [255,107,53],
+  chaud:   [200,129,58],
+  cannette:[224,53,53],
+  confis:  [255,158,203],
+  glaces:  [125,211,252]
+};
+Object.entries(catColors).forEach(([id,[r,g,b]]) => {
+  const sec = document.getElementById(id);
+  if (sec) {
+    sec.style.setProperty('--cat-r', r);
+    sec.style.setProperty('--cat-g', g);
+    sec.style.setProperty('--cat-b', b);
+    sec.style.setProperty('--cat-color', `rgb(${r},${g},${b})`);
+    const icon = sec.querySelector('.section-icon-wrap');
+    if (icon) {
+      icon.style.background = `rgba(${r},${g},${b},.12)`;
+      icon.style.borderColor = `rgba(${r},${g},${b},.3)`;
+      icon.style.color = `rgb(${r},${g},${b})`;
+    }
+    const title = sec.querySelector('.section-title');
+    if (title) title.style.color = `rgb(${r},${g},${b})`;
+    const sep = sec.querySelector('.section-sep');
+    if (sep) sep.style.background = `rgb(${r},${g},${b})`;
+    // Colore les price-tags de la section
+    sec.querySelectorAll('.price-tag').forEach(pt => {
+      pt.style.background = `rgb(${r},${g},${b})`;
+      pt.style.color = (r > 200 && g > 150) ? '#000' : '#fff';
+    });
+  }
+});
+
+/* ════════════════════════════════════════════════════
+   ⑨ HERO SPLIT — tourne les images toutes les 5s
+════════════════════════════════════════════════════ */
+(function(){
+  const heroImgs = [
+    'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=800&q=80',
+    'https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=800&q=80',
+    'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=800&q=80',
+    'https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?w=800&q=80',
+  ];
+  const imgEl = document.getElementById('heroSplitImg');
+  if (!imgEl) return;
+  let idx = 0;
+  setInterval(() => {
+    idx = (idx + 1) % heroImgs.length;
+    imgEl.style.opacity = '0';
+    setTimeout(() => {
+      imgEl.src = heroImgs[idx];
+      imgEl.style.opacity = '1';
+    }, 500);
+  }, 5000);
+})();
 
 /* ════════════════════════════════════════════════════
    ADMIN PANEL
