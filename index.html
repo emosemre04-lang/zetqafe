@@ -1187,6 +1187,38 @@
       background:rgba(245,197,24,.04);
     }
 
+    /* ── Rupture de stock ── */
+    .out-of-stock { pointer-events:auto !important; }
+    .out-of-stock img.card-bg,
+    .out-of-stock .thumb-wrap img { filter:grayscale(1) brightness(.45) !important; }
+    .rupture-overlay {
+      position:absolute; inset:0; z-index:6;
+      background:rgba(0,0,0,.62);
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center; gap:6px;
+      border-radius:inherit;
+    }
+    .rupture-overlay i { font-size:22px; color:#ff4444; }
+    .rupture-overlay span {
+      font-size:11px; font-weight:700; color:#ff4444;
+      letter-spacing:.06em; text-transform:uppercase;
+    }
+    .rupture-overlay .rupture-sub {
+      font-size:10px; color:rgba(255,255,255,.45);
+      font-weight:400; text-transform:none; letter-spacing:0;
+    }
+    .adm-rupt-btn {
+      flex:1; display:flex; align-items:center; justify-content:center; gap:7px;
+      padding:11px; border-radius:12px; font-size:13px; font-weight:600;
+      border:1.5px solid rgba(255,100,100,.2); background:rgba(255,100,100,.04);
+      color:rgba(255,100,100,.45); cursor:pointer;
+      font-family:'Poppins',sans-serif; transition:all .2s;
+    }
+    .adm-rupt-btn.on {
+      background:rgba(255,68,68,.15); border-color:#ff4444; color:#ff4444;
+    }
+    .adm-rupt-btn:hover { border-color:#ff4444; color:#ff4444; }
+
     /* popular badge (affiché sur les cards/items marqués populaires) */
     .popular-badge {
       position:absolute; top:10px; left:10px;
@@ -1460,7 +1492,7 @@
       <h3 class="modal-name" id="modalName"></h3>
       <div class="modal-price-row">
         <div class="modal-price" id="modalPrice"></div>
-        <div class="modal-badge"><i class="fa-solid fa-tag"></i> ZetQafé</div>
+        <div class="modal-badge"><img src="logo.png" alt="ZetQafé" style="height:22px;object-fit:contain;opacity:.85;"/></div>
       </div>
     </div>
   </div>
@@ -1680,14 +1712,19 @@ document.querySelectorAll('.list-item').forEach(item => {
 document.querySelectorAll('.list-item').forEach(item => {
   const img   = item.querySelector('.thumb-wrap img');
   const name  = item.querySelector('.list-name');
+  const badge = item.querySelector('.price-tag');
   const num   = item.querySelector('.list-price .num');
   const icon  = item.querySelector('.thumb-fallback i');
   item.style.cursor = 'pointer';
   item.addEventListener('click', () => {
+    // prix : d'abord le badge (après restructure), sinon .num
+    let price = '';
+    if (badge) price = badge.textContent.trim();
+    else if (num) price = num.textContent.trim() + ' €';
     openModal(
       img  ? img.src.replace(/w=\d+/, 'w=900') : '',
       name ? name.textContent : '',
-      num  ? num.textContent + ' €' : '',
+      price,
       icon ? icon.className : ''
     );
   });
@@ -1811,12 +1848,13 @@ if (!('ontouchstart' in window)) {
         const name  = card.querySelector('.card-name');
         const price = card.querySelector('.price-tag');
         products.push({
-          id:       catId + '_c' + idx,
-          name:     name  ? name.textContent.trim()  : '',
-          price:    price ? price.textContent.replace(/[^0-9,\.]/g,'').trim() : '',
-          img:      img   ? img.getAttribute('src')  : '',
-          popular:  card.classList.contains('popular'),
-          discount: ''
+          id:         catId + '_c' + idx,
+          name:       name  ? name.textContent.trim()  : '',
+          price:      price ? price.textContent.replace(/[^0-9,\.]/g,'').trim() : '',
+          img:        img   ? img.getAttribute('src')  : '',
+          popular:    card.classList.contains('popular'),
+          discount:   '',
+          outOfStock: false
         });
       });
 
@@ -1826,12 +1864,13 @@ if (!('ontouchstart' in window)) {
         const name  = item.querySelector('.list-name');
         const num   = item.querySelector('.list-price .num');
         products.push({
-          id:       catId + '_l' + idx,
-          name:     name ? name.textContent.trim()  : '',
-          price:    num  ? num.textContent.trim()   : '',
-          img:      img  ? img.getAttribute('src')  : '',
-          popular:  item.classList.contains('popular'),
-          discount: ''
+          id:         catId + '_l' + idx,
+          name:       name ? name.textContent.trim()  : '',
+          price:      num  ? num.textContent.trim()   : '',
+          img:        img  ? img.getAttribute('src')  : '',
+          popular:    item.classList.contains('popular'),
+          discount:   '',
+          outOfStock: false
         });
       });
 
@@ -1952,9 +1991,19 @@ if (!('ontouchstart' in window)) {
             popBadge.innerHTML = '<i class="fa-solid fa-fire"></i>';
             card.appendChild(popBadge);
           }
-        } else if (popBadge) {
-          popBadge.remove();
-        }
+        } else if (popBadge) { popBadge.remove(); }
+
+        // rupture de stock
+        card.classList.toggle('out-of-stock', !!prod.outOfStock);
+        let ruptOverlay = card.querySelector('.rupture-overlay');
+        if (prod.outOfStock) {
+          if (!ruptOverlay) {
+            ruptOverlay = document.createElement('div');
+            ruptOverlay.className = 'rupture-overlay';
+            ruptOverlay.innerHTML = '<i class="fa-solid fa-ban"></i><span>Plus disponible</span><span class="rupture-sub">Revenez bientôt !</span>';
+            card.appendChild(ruptOverlay);
+          }
+        } else if (ruptOverlay) { ruptOverlay.remove(); }
       });
 
       // list items
@@ -1988,9 +2037,19 @@ if (!('ontouchstart' in window)) {
             item.style.position = 'relative';
             item.appendChild(popBadge);
           }
-        } else if (popBadge) {
-          popBadge.remove();
-        }
+        } else if (popBadge) { popBadge.remove(); }
+
+        // rupture de stock
+        item.classList.toggle('out-of-stock', !!prod.outOfStock);
+        let ruptOvr = item.querySelector('.rupture-overlay');
+        if (prod.outOfStock) {
+          if (!ruptOvr) {
+            ruptOvr = document.createElement('div');
+            ruptOvr.className = 'rupture-overlay';
+            ruptOvr.innerHTML = '<i class="fa-solid fa-ban"></i><span>Plus disponible</span><span class="rupture-sub">Revenez bientôt !</span>';
+            item.appendChild(ruptOvr);
+          }
+        } else if (ruptOvr) { ruptOvr.remove(); }
       });
     });
   }
@@ -2219,12 +2278,21 @@ if (!('ontouchstart' in window)) {
 
       const popBtn = document.createElement('button');
       popBtn.className = 'adm-pop-btn' + (prod.popular ? ' on' : '');
-      popBtn.innerHTML = '<i class="fa-solid fa-fire"></i> ' + (prod.popular ? 'Populaire' : 'Populaire');
+      popBtn.innerHTML = '<i class="fa-solid fa-fire"></i> Populaire';
       popBtn.addEventListener('click', () => {
         prod.popular = !prod.popular;
         popBtn.classList.toggle('on', prod.popular);
       });
       actions.appendChild(popBtn);
+
+      const ruptBtn = document.createElement('button');
+      ruptBtn.className = 'adm-rupt-btn' + (prod.outOfStock ? ' on' : '');
+      ruptBtn.innerHTML = '<i class="fa-solid fa-ban"></i> Rupture';
+      ruptBtn.addEventListener('click', () => {
+        prod.outOfStock = !prod.outOfStock;
+        ruptBtn.classList.toggle('on', prod.outOfStock);
+      });
+      actions.appendChild(ruptBtn);
 
       const delProd = document.createElement('button');
       delProd.className = 'adm-del-btn';
