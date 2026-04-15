@@ -296,21 +296,13 @@
     }
     .section-icon-wrap i { color:var(--gold); font-size:17px; }
     .section-title {
-      font-family:'Playfair Display',serif;
-      font-size: clamp(18px,3.5vw,28px); font-weight:700;
-      background: linear-gradient(90deg,
-        var(--gold) 0%, #fff 28%, var(--gold3) 50%, #fff 72%, var(--gold) 100%);
-      background-size:400% auto;
-      -webkit-background-clip:text; -webkit-text-fill-color:transparent;
-      background-clip:text;
-      animation: shimmer 5.5s linear infinite;
+      font-family:'Poppins',sans-serif;
+      font-size: clamp(18px,3.5vw,26px); font-weight:700;
+      color: var(--text);
+      letter-spacing:-.01em;
     }
     [data-theme="light"] .section-title {
-      background: linear-gradient(90deg,
-        var(--gold2) 0%, #333 28%, var(--gold) 50%, #333 72%, var(--gold2) 100%);
-      background-size:400% auto;
-      -webkit-background-clip:text; background-clip:text;
-      animation: shimmer 5.5s linear infinite;
+      color: var(--text);
     }
     .section-sep { flex:1; height:1px; background: linear-gradient(90deg,var(--sep-color),transparent); }
 
